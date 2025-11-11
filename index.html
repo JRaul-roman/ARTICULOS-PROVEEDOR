@@ -68,7 +68,7 @@
             fileStatus.textContent = 'Cargando base de datos...';
             fileStatus.className = 'text-center text-sm text-gray-500 font-medium h-5 mt-3';
 
-            fetch('productos.json')
+            fetch('https://raw.githubusercontent.com/JRaul-roman/ARTICULOS-PROVEEDOR/refs/heads/main/productos.json')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Error al cargar el archivo: ${response.statusText}`);
