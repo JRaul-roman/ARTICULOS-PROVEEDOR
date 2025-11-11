@@ -68,46 +68,25 @@
             fileStatus.textContent = 'Cargando base de datos...';
             fileStatus.className = 'text-center text-sm text-gray-500 font-medium h-5 mt-3';
 
-            fetch('PRODUCTOS-PROVEEDORES.csv')
+            fetch('productos.json')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Error al cargar el archivo: ${response.statusText}`);
                     }
-                    return response.text();
+                    return response.json();
                 })
-                .then(csvData => {
-                    try {
-                        const lines = csvData.replace(/\r\n/g, '\n').replace(/^\uFEFF/, '').split('\n');
-                        const dataLines = lines.slice(1).filter(line => line.trim() !== '');
-
-                        productData = dataLines.map(line => {
-                            const values = line.split(';');
-                            if (values.length >= 2) {
-                                const provider = values[0].trim();
-                                const description = values[1].trim();
-                                if (provider && description) {
-                                    return { description, provider };
-                                }
-                            }
-                            return null;
-                        }).filter(p => p);
-
-                        if (productData.length > 0) {
-                            fileStatus.textContent = `¡Éxito! Se cargaron ${productData.length} registros.`;
-                            fileStatus.className = 'text-center text-sm text-green-600 font-medium h-5 mt-3';
-                        } else {
-                            fileStatus.textContent = 'Error: No se encontraron datos de productos válidos en el archivo.';
-                            fileStatus.className = 'text-center text-sm text-red-600 font-medium h-5 mt-3';
-                        }
-
-                    } catch (error) {
-                        fileStatus.textContent = 'Ocurrió un error crítico al procesar los datos.';
+                .then(data => {
+                    productData = data;
+                    if (productData.length > 0) {
+                        fileStatus.textContent = `¡Éxito! Se cargaron ${productData.length} registros.`;
+                        fileStatus.className = 'text-center text-sm text-green-600 font-medium h-5 mt-3';
+                    } else {
+                        fileStatus.textContent = 'Error: No se encontraron datos de productos válidos en el archivo.';
                         fileStatus.className = 'text-center text-sm text-red-600 font-medium h-5 mt-3';
-                        console.error("Error detallado:", error);
                     }
                 })
                 .catch(error => {
-                    fileStatus.textContent = 'No se pudo cargar el archivo CSV.';
+                    fileStatus.textContent = 'No se pudo cargar el archivo JSON.';
                     fileStatus.className = 'text-center text-sm text-red-600 font-medium h-5 mt-3';
                     console.error('Error en fetch:', error);
                 });
@@ -138,7 +117,7 @@
             }
 
             const matches = productData.filter(p => 
-                p.description.toLowerCase().includes(lowerCaseQuery)
+                p.Producto.toLowerCase().includes(lowerCaseQuery)
             );
             
             if (matches.length > 0) {
@@ -155,15 +134,15 @@
 
         function displayResults(matches, query) {
             const productsGrouped = matches.reduce((acc, product) => {
-                const key = product.description;
+                const key = product.Producto;
                 if (!acc[key]) {
                     acc[key] = {
-                        description: product.description,
+                        description: product.Producto,
                         providers: []
                     };
                 }
-                if (!acc[key].providers.includes(product.provider)) {
-                    acc[key].providers.push(product.provider);
+                if (!acc[key].providers.includes(product.Proveedor)) {
+                    acc[key].providers.push(product.Proveedor);
                 }
                 return acc;
             }, {});
